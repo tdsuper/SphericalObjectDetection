@@ -1,6 +1,6 @@
 # Spherical Image Object Detection
 <p align="center">
-<img src="./images/representation.jpg" alt="representation" />
+<img src="./images/representation.jpg" alt="representation" width="85%" height="85%" />
 </p>
 
 # Unbiased Spherical IoU
@@ -52,7 +52,7 @@ Our **Unbiased Spherical IoU** first calculates the area of each spherical recta
 
 ## Comparisons with Existing Biased Methods
 <p align="center">
-<img src="./images/tables.png" alt="tables" />
+<img src="./images/tables.png" alt="tables" width="85%" height="85%" />
 </p>
 
 * The IoUs computed with different methods for three cases (Resolution: 1024×512). Here spherical integral by numerical integration is taken as the reference method. The differences are listed between each method and the reference method.
