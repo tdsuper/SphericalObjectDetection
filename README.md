@@ -1,6 +1,6 @@
 # Spherical Image Object Detection
 <p align="center">
-<img src="./images/representation.jpg" alt="representation" width="500" height="170" />
+<img src="./images/representation.jpg" alt="representation" />
 </p>
 
 # Unbiased Spherical IoU
