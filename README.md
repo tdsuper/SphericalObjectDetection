@@ -1,6 +1,6 @@
 # Spherical Image Object Detection
 <p align="center">
-<img src="./images/representation.jpg" alt="representation" width="1000" height="340" />
+<img src="./images/representation.jpg" alt="representation" width="500" height="170" />
 </p>
 
 # Unbiased Spherical IoU
@@ -17,9 +17,9 @@ Our **Unbiased Spherical IoU** first calculates the area of each spherical recta
 
 **First**, the area of each spherical rectangle can be computed according to the following formula. (The derivation is given in the supplementary material of our paper.)
 
-<center>
+<p align="center">
 <img src="https://render.githubusercontent.com/render/math?math=A(b_i)%20=%204\arccos(-\sin\frac{\alpha_i}{2}\sin\frac{\beta_i}{2})%20-%202\pi,%20\text{for}%20\%20i%20\in%20\{1,%202\}.">
-</center>
+</p>
 
 **Second**, the computation of intersection area contains 3 steps:
 
@@ -33,9 +33,9 @@ Our **Unbiased Spherical IoU** first calculates the area of each spherical recta
 
 **Finally**, the spherical IoU is computed by the following formula
 
-<center>
+<p align="center">
 <img src="https://render.githubusercontent.com/render/math?math=IoU(b_1,%20b_2)%20=%20\frac{A(b_1%20\cap%20b_2)}{A(b_1%20\cup%20b_2)}%20=%20\frac{A(b_1%20\cap%20b_2)}{A(b_1)%2BA(b_2)%20-%20A(b_1%20\cap%20b_2)}.">
-</center>
+</p>
 
 ## Examples
 
@@ -52,7 +52,7 @@ Our **Unbiased Spherical IoU** first calculates the area of each spherical recta
 
 ## Comparisons with Existing Biased Methods
 <p align="center">
-<img src="./images/tables.png" alt="tables" style="zoom:50%;" />
+<img src="./images/tables.png" alt="tables" />
 </p>
 
 * The IoUs computed with different methods for three cases (Resolution: 1024×512). Here spherical integral by numerical integration is taken as the reference method. The differences are listed between each method and the reference method.
