@@ -5,7 +5,7 @@ Spherical image object detection is to detect objects in spherical images (360 d
 ## Evaluation Metric
 As the spherical images have deformations, the traditional axis-aligned rectangles can not be used as the bounding boxes for objects. Here we use spherical rectangles as the bounding boxes for spherical objects.
 <p align='center'>
-<img src="./images/representation.jpg" style="zoom: 65%;" />
+<img src="./images/representation.jpg" style="zoom: 45%;" />
 </p>
 
 ### Unbiased IoU
@@ -36,7 +36,7 @@ Our **Unbiased Spherical IoU** first calculates the area of each spherical recta
 ### Rotated Bounding FoV (RBFov)
 The RBFoV is defined by $(\theta, \phi, \alpha, \beta, \gamma)$, where $\theta$ and $\phi$ are the longitude and latitude coordinates of the object center, and $\alpha$, $\beta$ denote the up-down and left-right field-of-view angles of the object’s occupation, $\gamma$ is represents the angle (clockwise is positive, counterclockwise is negative) of the rotation of the tangent plane of the RBFoV along the axis $\vec{OM}$ (The $M$ is the tangent point $(\theta, \phi)$). The range of values of $\gamma$ is $[-90, 90]$.
 <p align="center">
-<img src="images/RBFoV.png" style="zoom: 30%;" />
+<img src="images/RBFoV.png" style="zoom: 10%;" />
 </p>
 
 ## PANDORA Dataset
