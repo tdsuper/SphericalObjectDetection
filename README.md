@@ -5,7 +5,7 @@ Spherical image object detection is to detect objects in spherical images (360 d
 ## Evaluation Metric
 As the spherical images have deformations, the traditional axis-aligned rectangles can not be used as the bounding boxes for objects. Here we use spherical rectangles as the bounding boxes for spherical objects.
 <p align='center'>
-<img src="./images/representation.jpg" style="zoom: 20%;" />
+<img src="./images/representation.jpg" width='60%' height='60%' />
 </p>
 
 ### Unbiased IoU
