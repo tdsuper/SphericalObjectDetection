@@ -50,7 +50,7 @@ The dataset can be downloaded from [here](https://drive.google.com/file/d/1JAGRe
 We propose two anchor-free object detection methods based on CenterNet. One is called Sph-CenterNet, the other one is called R-CenterNet. These networks take panoramic images as input, and predict heatmaps, offsets, sizes. R-CenterNet additionally predicts rotation angle for each object. 
 
 <p align="center">
-<img src="images/RCenterNet.jpg" width='80%' height='80%' />
+<img src="images/RCenterNet.jpg" width='90%' height='90%' />
 </p>
 <!-- ## Citing Our Work -->
 
