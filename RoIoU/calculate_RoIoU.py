@@ -1,5 +1,40 @@
 import numpy as np
 
+def theta_phi_to_xyz(theta, phi):
+    xyz = np.concatenate((
+        np.sin(phi) * np.cos(theta), np.sin(phi) * np.sin(theta), np.cos(phi)
+    ), axis=1)
+    return xyz
+
+def roll_T(n, xyz, gamma=0):
+    gamma = gamma / 180 * np.pi
+    n11 = (n[...,0] ** 2) * (1 - np.cos(gamma)) + np.cos(gamma)
+    n12 = n[...,0] * n[...,1] * (1 - np.cos(gamma)) - n[...,2] * np.sin(gamma)
+    n13 = n[...,0] * n[...,2] * (1 - np.cos(gamma)) + n[...,1] * np.sin(gamma)
+
+    n21 = n[...,0] * n[...,1] * (1 - np.cos(gamma)) + n[...,2] * np.sin(gamma)
+    n22 = (n[...,1] ** 2) * (1 - np.cos(gamma)) + np.cos(gamma)
+    n23 = n[...,1] * n[...,2] * (1 - np.cos(gamma)) - n[...,0] * np.sin(gamma)
+
+    n31 = n[...,0] * n[...,2] * (1 - np.cos(gamma)) - n[...,1] * np.sin(gamma)
+    n32 = n[...,1] * n[...,2] * (1 - np.cos(gamma)) + n[...,0] * np.sin(gamma)
+    n33 = (n[...,2] ** 2) * (1 - np.cos(gamma)) + np.cos(gamma)
+
+    x, y, z = xyz[...,0], xyz[...,1], xyz[...,2]
+
+    xx = np.array([np.diagonal(n11 * x + n12 * y + n13 * z)]).T
+    yy = np.array([np.diagonal(n21 * x + n22 * y + n23 * z)]).T
+    zz = np.array([np.diagonal(n31 * x + n32 * y + n33 * z)]).T
+
+    return np.concatenate((xx,yy, zz), axis=1)
+
+
+
+def roArrayVector(theta, phi, v, ang):
+    c_xyz = theta_phi_to_xyz(theta, phi)
+    p_xyz = v
+    pp_xyz = roll_T(c_xyz, p_xyz, ang)
+    return pp_xyz
 
 class Sph:
     '''Unbiased IoU Computation for Spherical Rectangles'''
@@ -13,8 +48,8 @@ class Sph:
 
     def getNormal(self, bbox):
         '''Normal Vectors Computation'''
-        theta, phi, fov_x_half, fov_y_half = bbox[:, [
-            0]], bbox[:, [1]], bbox[:, [2]] / 2, bbox[:, [3]] / 2
+        theta, phi, fov_x_half, fov_y_half, angle = bbox[:, [
+            0]], bbox[:, [1]], bbox[:, [2]] / 2, bbox[:, [3]] / 2, bbox[:,[4]]
         V_lookat = np.concatenate((
             np.sin(phi) * np.cos(theta), np.sin(phi) *
             np.sin(theta), np.cos(phi)
@@ -29,6 +64,12 @@ class Sph:
         N_right = np.cos(fov_x_half) * V_right + np.sin(fov_x_half) * V_lookat
         N_up = -np.cos(fov_y_half) * V_up + np.sin(fov_y_half) * V_lookat
         N_down = np.cos(fov_y_half) * V_up + np.sin(fov_y_half) * V_lookat
+
+        N_left = roArrayVector(theta, phi, N_left, angle)
+        N_right = roArrayVector(theta, phi, N_right, angle)
+        N_up = roArrayVector(theta, phi, N_up, angle)
+        N_down = roArrayVector(theta, phi, N_down, angle)
+
         V = np.array([
             np.cross(N_left, N_up), np.cross(N_down, N_left),
             np.cross(N_up, N_right), np.cross(N_right, N_down)
@@ -127,7 +168,7 @@ class Sph:
         res = np.hstack((dets.repeat(g_size, axis=0), np.tile(
             gt, (d_size, 1)))).reshape(d_size * g_size, -1)
         area_A = self.area(res[:, 2], res[:, 3])
-        area_B = self.area(res[:, 6], res[:, 7])
-        inter = self.computeInter(res[:, :4], res[:, 4:])
+        area_B = self.area(res[:, 7], res[:, 8])
+        inter = self.computeInter(res[:, :5], res[:, 5:])
         final = (inter / (area_A + area_B - inter)).reshape(d_size, g_size)
         return final

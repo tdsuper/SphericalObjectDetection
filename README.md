@@ -1,18 +1,14 @@
 # Spherical Image Object Detection
-<p align="center">
-<img src="./images/representation.jpg" alt="representation" width="85%" height="85%" />
+Spherical image object detection is to detect objects in spherical images (360 degree panorams) which have spherical deformations.
+<img src="./images/SphObjDet.jpg" alt="Spherical Image Object Detection" />
+
+## Evaluation Metric
+As the spherical images have deformations, the traditional axis-aligned rectangles can not be used as the bounding boxes for objects. Here we use spherical rectangles as the bounding boxes for spherical objects.
+<p align='center'>
+<img src="./images/representation.jpg" style="zoom: 65%;" />
 </p>
 
-# Unbiased Spherical IoU
-
-**Unbiased IoU for Spherical Image Object Detection**<br>
-Feng Dai, Bin Chen, Hang Xu, Yike Ma, Xiaodong Li, Bailan Feng, Peng Yuan, Chenggang Yan, Qiang Zhao*.<br>
-AAAI Conference on Artificial Intelligence (AAAI), 2022. Paper Link:  [arXiv](https://arxiv.org/abs/2108.08029).
-
-<img src="./images/intersection.jpg" alt="intersection" style="zoom: 45%;" />
-
-## Algorithms
-
+### Unbiased IoU
 Our **Unbiased Spherical IoU** first calculates the area of each spherical rectangle, then calculates the intersection area of the two spherical rectangles. Finally, we compute the spherical IoU.
 
 **First**, the area of each spherical rectangle can be computed according to the following formula. (The derivation is given in the supplementary material of our paper.)
@@ -37,74 +33,48 @@ Our **Unbiased Spherical IoU** first calculates the area of each spherical recta
 <img src="https://render.githubusercontent.com/render/math?math=IoU(b_1,%20b_2)%20=%20\frac{A(b_1%20\cap%20b_2)}{A(b_1%20\cup%20b_2)}%20=%20\frac{A(b_1%20\cap%20b_2)}{A(b_1)%2BA(b_2)%20-%20A(b_1%20\cap%20b_2)}.">
 </p>
 
-## Examples
-
-| ![example1](./images/example1.jpg) | ![example2](./images/example2.jpg) | ![example3](./images/example3.jpg) |
-| :--------------------------------: | :--------------------------------: | :--------------------------------: |
-|   *Example 1:*  IoU = 0.34272136   |   *Example 2:*  IoU = 0.58728738   |      *Example 3:*  IoU = 0.0       |
-| ![example4](./images/example4.jpg) | ![example5](./images/example5.jpg) | ![example6](./images/example6.jpg) |
-|   *Example 4:*  IoU = 0.00521955   |   *Example 5:*  IoU = 0.79667179   |   *Example 6:*  IoU = 0.00049333   |
-
-* For example 1-3, the IoU can be easily calculated by our algorithm without loop-detection process in Sub-step 2 (Step 2) of the intersection area computation algorithm.
-* For example 4-6, these examples have at least 3 edges intersect at the same point, or even edges overlap. We need a loop detection algorithm to find the real points, which is a  process of finding a closed loop by DFS algorithm, but these cases are rarely in evaluation or training. The computation cost is negligible. 
-
-**Note:**  We just release the code for unbiased spherical IoU calculation without loop detection. If you are interested in the full version, please contact the authors. 
-
-## Comparisons with Existing Biased Methods
+### Rotated Bounding FoV (RBFov)
+The RBFoV is defined by $(\theta, \phi, \alpha, \beta, \gamma)$, where $\theta$ and $\phi$ are the longitude and latitude coordinates of the object center, and $\alpha$, $\beta$ denote the up-down and left-right field-of-view angles of the object’s occupation, $\gamma$ is represents the angle (clockwise is positive, counterclockwise is negative) of the rotation of the tangent plane of the RBFoV along the axis $\vec{OM}$ (The $M$ is the tangent point $(\theta, \phi)$). The range of values of $\gamma$ is $[-90, 90]$.
 <p align="center">
-<img src="./images/tables.png" alt="tables" width="85%" height="85%" />
+<img src="images/RBFoV.png" style="zoom: 30%;" />
 </p>
 
-* The IoUs computed with different methods for three cases (Resolution: 1024×512). Here spherical integral by numerical integration is taken as the reference method. The differences are listed between each method and the reference method.
-* Note that the spherical integral by numerical integration method will be degraded if we use unrolled spherical images with low resolution. It is also time-consuming, which takes 37.5ms for IoU calculation, while our method (Unbiased IoU) is much faster and only needs 0.99ms at the same resolution (1024×512).
+## PANDORA Dataset
+**PANDORA** (PANoramic Detection Dataset for Object with ORientAtion) is a dataset for object detection in panoramic images. It contains 3,000 real-world indoor panoramic images with high-resolution (1920 × 960) and 94,353 bounding boxes of 47 categories that locate from low latitude regions to high latitude regions. Note that the annotations of the bounding box in the PANDORA dataset are defined by **RBFoV** our proposed.
+<p align="center">
+<img src="images/PANDORA.png" style="zoom: 50%;" />
+</p>
+The dataset can be downloaded from [here](https://drive.google.com/file/d/1JAGReczN_h3F3mY-mlGTVSeDx-CCJigC/view?usp=sharing). The annotation is in COCO format.
 
+## Spherical Object Detection Methods
+We propose two anchor-free object detection methods based on CenterNet. One is called Sph-CenterNet, the other one is called R-CenterNet. These networks take panoramic images as input, and predict heatmaps, offsets, sizes. R-CenterNet additionally predicts rotation angle for each object. 
 
-## Prerequisites
-
-- Python ≥ 3.6
-- Numpy==1.16.5 (We use this version. Other versions may be also applicable.)
-- Opencv-python == 4.5.1.48 (Optional for results visualization.)
-
-## Usage
-
-Some examples are given in `main.py` (*pred* and *gt*), and run the following command for demonstration.
-
-```python
-python main.py
-```
-
-The iou computation matrix will be calculated.
-
-Note that the format of the input spherical rectangle and the input of the function of our unbiased IoU is different, thus `transFormat` is used to change the format.
-
-```python
-The input format for pred and gt (angles)
-    [center_x, center_y, fov_x, fov_y]
-        center_x : [-180, 180]
-        center_y : [90, -90]
-        fov_x    : [0, 180]
-        fov_y    : [0, 180]
-The input format for our unbiased IoU: (radians)
-	[center_x, center_y, fov_x, fov_y]
-        center_x : [0, 360]
-        center_y : [0, 180]
-        fov_x    : [0, 180]
-        fov_y    : [0, 180]
-```
-
-If you do not want to see the visualization of the spherical rectangles, remove the call to `drawSphBBox`.
-
+<p align="center">
+<img src="images/RCenterNet.jpg" style="zoom: 8%;" />
+</p>
 <!-- ## Citing Our Work -->
 
-## Citing the Unbiased Spherical IoU
+## Citing our Works
 
-If you use our Unbiased IoU in your research, please cite our paper as
+If you use our Unbiased IoU in your research or Sph-CenterNet, please cite our AAAI work as
 
 ```BibTeX
 @inproceedings{SphIoU,
-  title={Unbiased IoU for Spherical Image Object Detection},
-  author={Dai, Feng and Chen, Bin and Xu, Hang and Ma, Yike and Li, Xiaodong and Feng, Bailan and Yan, Chenggang and Zhao, Qiang},
-  booktitle={Proceedings of AAAI Conference on Artificial Intelligence},
+  title = {Unbiased IoU for Spherical Image Object Detection},
+  author = {Dai, Feng and Chen, Bin and Xu, Hang and Ma, Yike and Li, Xiaodong and Feng, Bailan and Yuan, Peng and Yan, Chenggang and Zhao, Qiang},
+  booktitle = {Proceedings of AAAI Conference on Artificial Intelligence},
+  year = {2022},
+  pages = {508-515},
+}
+```
+
+If you use the PANDORA dataset, RBFoV or R-CenterNet, please cite our ECCV work as 
+
+```BibTeX
+@inproceedings{PANDORA,
+  title={PANDORA: A Panoramic Detection Dataset for Object with Orientation},
+  author={Xu, Hang and Zhao, Qiang and Ma, Yike and Li, Xiaodong and Yuan, Peng and Feng, Bailan and Yan, Chenggang and Dai, Feng},
+  booktitle={ECCV},
   year={2022}
 }
 ```
